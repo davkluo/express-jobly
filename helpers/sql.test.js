@@ -1,7 +1,7 @@
 'use strict';
 
 const { BadRequestError } = require("../expressError");
-const { sqlForPartialUpdate } = require('./sql');
+const { sqlForPartialUpdate, sqlForFilter } = require('./sql');
 
 const JS_TO_SQL = {
   firstName: "first_name",
@@ -26,6 +26,30 @@ describe('test sqlForPartialUpdate helper function', function() {
   test('should throw BadRequestError if given no data to update', function() {
     expect(() => {
       sqlForPartialUpdate({}, JS_TO_SQL);
+    }).toThrow(BadRequestError);
+  });
+
+});
+
+describe('test sqlForFilter helper function', function() {
+  test('should return intended whereConditions and values', function() {
+    const filters = {
+      nameLike: "c2",
+      minEmployees: 2,
+      maxEmployees: 3
+    };
+
+    const { whereConditions, values } = sqlForFilter(filters);
+
+    expect(whereConditions).toEqual(
+      '"name" ILIKE $1, "num_employees" >= $2, "num_employees" <= $3'
+      );
+    expect(values).toEqual(["%c2%", 2, 3]);
+  });
+
+  test('should throw BadRequestError if given no filter data', function() {
+    expect(() => {
+      sqlForFilter({});
     }).toThrow(BadRequestError);
   });
 

@@ -62,7 +62,25 @@ function sqlForFilter(filters) {
   // if it's minEmployees you add a num_employees >= $1 to the string
   // if it's maxEmployees you add a num_employees <= $1 to the string
 
+  const keys = Object.keys(filters);
+  let values = Object.values(filters);
+  if (keys.length === 0) throw new BadRequestError("No data");
 
+  const cols = keys.map((colName, idx) => {
+    if(colName === "nameLike") {
+      values[idx] = "%"+values[idx]+"%"
+      return `"name" ILIKE $${idx + 1}`
+    } else if (colName === "minEmployees") {
+        return `"num_employees" >= $${idx + 1}`
+      } else if (colName === "maxEmployees") {
+        return `"num_employees" <= $${idx + 1}`
+      }
+  });
+
+  return {
+    whereConditions: cols.join(", "),
+    values
+  };
 
 
 
@@ -85,4 +103,4 @@ function sqlForFilter(filters) {
 
 }
 
-module.exports = { sqlForPartialUpdate };
+module.exports = { sqlForPartialUpdate, sqlForFilter };
