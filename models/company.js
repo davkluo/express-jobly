@@ -49,12 +49,22 @@ class Company {
     return company;
   }
 
-  /** Find all companies.
+  /** Find all companies. Optional filters can be applied.
+   *
+   * filters: Object with key-value pairs corresponding to the filter options
    *
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll() {
+  static async findAll(filters) {
+    let whereStatement = '';
+
+    if (filters){
+      //do some stuff
+      //specifically, create the WHERE clause for the following select statement
+      whereStatement = 'WHERE ____';
+    }
+
     const companiesRes = await db.query(
         `SELECT handle,
                 name,
@@ -62,6 +72,7 @@ class Company {
                 num_employees AS "numEmployees",
                 logo_url AS "logoUrl"
            FROM companies
+           ${whereStatement}
            ORDER BY name`);
     return companiesRes.rows;
   }
