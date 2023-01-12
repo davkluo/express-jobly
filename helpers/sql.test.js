@@ -2,7 +2,7 @@
 
 const { BadRequestError } = require("../expressError");
 const { sqlForPartialUpdate, sqlForFilter } = require('./sql');
-const { COMPANY_FILTER_OPTIONS } = require('../config');
+const Company = require('../models/company');
 
 const JS_TO_SQL = {
   firstName: "first_name",
@@ -41,7 +41,7 @@ describe('test sqlForFilter helper function', function() {
     };
 
     const { whereConditions, values } = sqlForFilter(filters,
-                                                    COMPANY_FILTER_OPTIONS);
+                                                Company.COMPANY_FILTER_OPTIONS);
 
     expect(whereConditions).toEqual(
       '"name" ILIKE $1 AND "num_employees" >= $2 AND "num_employees" <= $3'
@@ -51,7 +51,7 @@ describe('test sqlForFilter helper function', function() {
 
   test('should throw BadRequestError if given no filter data', function() {
     expect(() => {
-      sqlForFilter({}, COMPANY_FILTER_OPTIONS);
+      sqlForFilter({}, Company.COMPANY_FILTER_OPTIONS);
     }).toThrow(BadRequestError);
   });
 

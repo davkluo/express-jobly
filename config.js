@@ -21,21 +21,6 @@ function getDatabaseUri() {
 // WJB: Evaluate in 2021 if this should be increased to 13 for non-test use
 const BCRYPT_WORK_FACTOR = process.env.NODE_ENV === "test" ? 1 : 12;
 
-const COMPANY_FILTER_OPTIONS = {
-  nameLike: {
-    column: "name",
-    operator: "ILIKE"
-  },
-  minEmployees: {
-    column: "num_employees",
-    operator: ">="
-  },
-  maxEmployees: {
-    column: "num_employees",
-    operator: "<="
-  }
-};
-
 console.log("Jobly Config:".green);
 console.log("SECRET_KEY:".yellow, SECRET_KEY);
 console.log("PORT:".yellow, PORT.toString());

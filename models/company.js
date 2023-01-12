@@ -4,11 +4,25 @@ const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
 const { sqlForPartialUpdate, sqlForFilter } = require("../helpers/sql");
 
-const { COMPANY_FILTER_OPTIONS } = require('../config');
-
 /** Related functions for companies. */
 
 class Company {
+
+  static COMPANY_FILTER_OPTIONS = {
+    nameLike: {
+      column: "name",
+      operator: "ILIKE"
+    },
+    minEmployees: {
+      column: "num_employees",
+      operator: ">="
+    },
+    maxEmployees: {
+      column: "num_employees",
+      operator: "<="
+    }
+  };
+
   /** Create a company (from data), update db, return new company data.
    *
    * data should be { handle, name, description, numEmployees, logoUrl }
@@ -64,7 +78,7 @@ class Company {
 
     if (filters){
       const { whereConditions, values } = sqlForFilter(filters,
-                                                      COMPANY_FILTER_OPTIONS);
+                                                Company.COMPANY_FILTER_OPTIONS);
 
       whereStatement = `WHERE ${whereConditions}`;
       parameters.push(...values);
