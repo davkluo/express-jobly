@@ -18,7 +18,6 @@ const userUpdateSchema = require("../schemas/userUpdate.json");
 
 const router = express.Router();
 
-
 /** POST / { user }  => { user, token }
  *
  * Adds a new user. This is not the registration endpoint --- instead, this is
@@ -28,7 +27,7 @@ const router = express.Router();
  * This returns the newly created user and an authentication token for them:
  *  {user: { username, firstName, lastName, email, isAdmin }, token }
  *
- * Authorization required: login
+ * Authorization required: admin only
  **/
 
 router.post("/", ensureIsAdmin, async function (req, res, next) {
@@ -52,7 +51,7 @@ router.post("/", ensureIsAdmin, async function (req, res, next) {
  *
  * Returns list of all users.
  *
- * Authorization required: login
+ * Authorization required: admin only
  **/
 
 router.get("/", ensureIsAdmin, async function (req, res, next) {
@@ -65,7 +64,7 @@ router.get("/", ensureIsAdmin, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
 router.get(
@@ -85,7 +84,7 @@ router.get(
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
 router.patch(
@@ -110,7 +109,7 @@ router.patch(
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: admin or same user
  **/
 
 router.delete(

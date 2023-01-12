@@ -15,14 +15,13 @@ const companyFilterSchema = require ('../schemas/companyFilter.json');
 
 const router = new express.Router();
 
-
 /** POST / { company } =>  { company }
  *
  * company should be { handle, name, description, numEmployees, logoUrl }
  *
  * Returns { handle, name, description, numEmployees, logoUrl }
  *
- * Authorization required: login
+ * Authorization required: admin only
  */
 
 router.post("/", ensureIsAdmin, async function (req, res, next) {
@@ -111,7 +110,7 @@ router.get("/:handle", async function (req, res, next) {
  *
  * Returns { handle, name, description, numEmployees, logo_url }
  *
- * Authorization required: login
+ * Authorization required: admin only
  */
 
 router.patch("/:handle", ensureIsAdmin, async function (req, res, next) {
@@ -131,7 +130,7 @@ router.patch("/:handle", ensureIsAdmin, async function (req, res, next) {
 
 /** DELETE /[handle]  =>  { deleted: handle }
  *
- * Authorization: login
+ * Authorization: admin only
  */
 
 router.delete("/:handle", ensureIsAdmin, async function (req, res, next) {
