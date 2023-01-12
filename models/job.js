@@ -1,32 +1,82 @@
 "use strict";
 
 const db = require("../db");
-// const bcrypt = require("bcrypt");
-// const { sqlForPartialUpdate } = require("../helpers/sql");
-// const {
-//   NotFoundError,
-//   BadRequestError,
-//   UnauthorizedError,
-// } = require("../expressError");
+const { BadRequestError, NotFoundError } = require("../expressError");
+const { sqlForPartialUpdate, sqlForFilter } = require("../helpers/sql");
 
-// const { BCRYPT_WORK_FACTOR } = require("../config.js");
 
-/** Related functions for users. */
+/** Related functions for jobs. */
 
 class Job {
-  static async testFloatNumeric() {
-    // const result = await db.query(
-    //   `SELECT floatval, numval
-    //     FROM numbers_test2`
-    // );
 
-    // const example = result.rows[0];
-    // console.log('example', example);
-    // console.log('floatval', example.floatval);
-    // console.log('floatval type', typeof example.floatval);
-    // console.log('numval', example.numval);
-    // console.log('numval type',typeof example.numval);
+  /**Create a job (from data), update db, return new job
+   *
+   * data should be {title, salary, equity, companyHandle}
+   *
+   * Returns {id, title, salary, equity, companyHandle}
+   *
+   * Throws BadRequestError if job already in database
+   *
+   */
+  static async create({ title, salary, equity, companyHandle}) {
+
   }
+
+  /**
+   * Find all jobs. Optional filters can be applied
+   *
+   * filters: Object with key-value pairs corresponding to the filter options
+   * {title, minSalary, hasEquity}
+   *
+   * Returns [{id, title, salary, equity, companyHandle}, ...]
+   */
+
+  static async findAll(filters) {
+
+  }
+
+  /**
+   * Given a job id, return data about a job.
+   *
+   * Returns {id, title, salary, equity, companyHandle}
+   *
+   * Throws NotFoundError if not found
+   */
+
+  static async get(id) {
+
+  }
+
+  /**
+   * Update job data with 'data'.
+   *
+   ** This is a "partial update" --- it's fine if data doesn't contain all the
+   * fields; this only changes provided ones.
+   *
+   * Data can include: {title, salary, equity}
+   *
+   * Returns {id, title, salary, equity, companyHandle}
+   *
+   * Throws NotFoundError if not found
+   */
+
+   static async update(id, data) {
+
+   }
+
+   /**
+    * Delete given job from database; returns undefined.
+    *
+    * Throws NotFoundError if job not found
+    *
+    */
+
+   static async remove(id) {
+
+   }
+
+
+
 }
 
 
