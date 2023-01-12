@@ -49,9 +49,22 @@ function ensureIsAdmin(req, res, next) {
   return next();
 }
 
+/** Middleware to use to check if user is logged in as admin, or is the same
+ * as the user they are trying to access
+ *
+ * If not, raises UnauthorizedError
+ */
+
+function ensureSameUserOrIsAdmin(req, res, next) {
+  if (res.locals.user?.username !== req.params.username
+    && !res.locals.user?.isAdmin) {
+      throw new UnauthorizedError();
+    }
+}
 
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  ensureIsAdmin
+  ensureIsAdmin,
+  ensureSameUserOrIsAdmin
 };
