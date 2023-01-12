@@ -60,6 +60,7 @@ function ensureSameUserOrIsAdmin(req, res, next) {
     && !res.locals.user?.isAdmin) {
       throw new UnauthorizedError();
     }
+  return next();
 }
 
 module.exports = {
