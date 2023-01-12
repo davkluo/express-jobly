@@ -219,6 +219,17 @@ describe("GET /companies", function () {
     expect(resp.statusCode).toEqual(400);
   });
 
+  test("BadRequestError if data violates schema",
+    async function () {
+      const filterData = { nameLike: 1, minEmployees: 'one', maxEmployees: -1};
+      const resp = await request(app)
+        .get("/companies")
+        .query(filterData);
+
+      expect(resp.statusCode).toEqual(400);
+    }
+  );
+
 });
 
 /************************************** GET /companies/:handle */

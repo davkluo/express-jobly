@@ -86,7 +86,7 @@ describe("findAll", function () {
     ]);
   });
 
-  test("works: filter name", async function () {
+  test("works: filter name (case-insensitive)", async function () {
     const filters = { nameLike: 'c2' };
     let companies = await Company.findAll(filters);
     expect(companies).toEqual([
@@ -155,6 +155,24 @@ describe("findAll", function () {
         description: "Desc2",
         numEmployees: 2,
         logoUrl: "http://c2.img",
+      }
+    ]);
+  });
+
+  test("works: filter by name, min and max employees", async function () {
+    const filters = {
+      nameLike: '1',
+      minEmployees: 1,
+      maxEmployees: 2
+    };
+    let companies = await Company.findAll(filters);
+    expect(companies).toEqual([
+      {
+        handle: "c1",
+        name: "C1",
+        description: "Desc1",
+        numEmployees: 1,
+        logoUrl: "http://c1.img",
       }
     ]);
   });

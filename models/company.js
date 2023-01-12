@@ -2,7 +2,9 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, sqlForFilter } = require("../helpers/sql");
+
+const { COMPANY_FILTER_OPTIONS } = require('../config');
 
 /** Related functions for companies. */
 
@@ -58,11 +60,14 @@ class Company {
 
   static async findAll(filters) {
     let whereStatement = '';
+    let parameters = [];
 
     if (filters){
-      //do some stuff
-      //specifically, create the WHERE clause for the following select statement
-      whereStatement = 'WHERE ____';
+      const { whereConditions, values } = sqlForFilter(filters,
+                                                      COMPANY_FILTER_OPTIONS);
+
+      whereStatement = `WHERE ${whereConditions}`;
+      parameters.push(...values);
     }
 
     const companiesRes = await db.query(
@@ -73,7 +78,8 @@ class Company {
                 logo_url AS "logoUrl"
            FROM companies
            ${whereStatement}
-           ORDER BY name`);
+           ORDER BY name`,
+        parameters);
     return companiesRes.rows;
   }
 

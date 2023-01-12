@@ -2,21 +2,6 @@
 
 const { BadRequestError } = require("../expressError");
 
-const FILTER_OPTIONS = {
-  nameLike: {
-    column: "name",
-    operator: "ILIKE"
-  },
-  minEmployees: {
-    column: "num_employees",
-    operator: ">="
-  },
-  maxEmployees: {
-    column: "num_employees",
-    operator: "<="
-  }
-};
-
 /**
  * sqlForPartialUpdate: Given an object with data for an update operation and
  * an object with JS key to SQL column name mappings, generate a string for the
@@ -46,61 +31,52 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 }
 
 /**
- * sqlForFilter: Given an object with filters, generate a string for the SQL
- * WHERE clause with placeholders and an array of values corresponding to those
- * placeholders. Return these in an object.
+ * sqlForFilter: Given an object with filters and an object defining the columns
+ * and operators for each filter, generate a string for the SQL WHERE clause
+ * with placeholders and an array of values corresponding to those placeholders.
+ * Return these in an object.
  *
  * filters: Object with filter data
  *
  * Returns object { whereConditions: String, values: Array }
  */
 
-function sqlForFilter(filters) {
-  // when the filters come in as { nameLike: 'blah', ....}
-  // we can iterate through the keys of the filters
-  // check if it's nameLike then you add a name ILIKE $1 to the string
-  // if it's minEmployees you add a num_employees >= $1 to the string
-  // if it's maxEmployees you add a num_employees <= $1 to the string
-
+function sqlForFilter(filters, filterOptions) {
   const keys = Object.keys(filters);
-  let values = Object.values(filters);
   if (keys.length === 0) throw new BadRequestError("No data");
 
-  const cols = keys.map((colName, idx) => {
-    if(colName === "nameLike") {
-      values[idx] = "%"+values[idx]+"%"
-      return `"name" ILIKE $${idx + 1}`
-    } else if (colName === "minEmployees") {
-        return `"num_employees" >= $${idx + 1}`
-      } else if (colName === "maxEmployees") {
-        return `"num_employees" <= $${idx + 1}`
-      }
+  const conditions = keys.map((filter, idx) => {
+    const { column, operator } = filterOptions[filter];
+
+    if (operator === 'ILIKE') {
+      filters[filter] = '%' + filters[filter] + '%';
+    }
+
+    return `"${column}" ${operator} $${idx + 1}`;
   });
 
   return {
-    whereConditions: cols.join(", "),
-    values
+    whereConditions: conditions.join(' AND '),
+    values: Object.values(filters)
   };
 
+  // Previous sqlForFilter implementation for reference
 
+  // const cols = keys.map((colName, idx) => {
+  //   if(colName === "nameLike") {
+  //     values[idx] = "%"+values[idx]+"%"
+  //     return `"name" ILIKE $${idx + 1}`
+  //   } else if (colName === "minEmployees") {
+  //       return `"num_employees" >= $${idx + 1}`
+  //     } else if (colName === "maxEmployees") {
+  //       return `"num_employees" <= $${idx + 1}`
+  //     }
+  // });
 
-  // and then using the global FILTER_OPTIONS object,
-  // we can obtain information on how to process that type of filter
-
-  // nameLike
-  // a = FILTER_OPTIONS['nameLike'] => gives me an object with {column, operator}
-  // with the above information, I can make a piece of a string
-  // with the format:
-  // `${a.column} ${a.operator} $1`
-  // `name ILIKE $1` `num_employees >= 2` `num_employees <= 2`
-
-  // nameLike -> ILIKE %text%
-  // minEmployee -> num_employees >= ____
-  // max.... -> num_employees <= ____
-  // `"name" ILIKE $1, "num_employees" >= $2, ....`
-  // [values]
-
-
+  // return {
+  //   whereConditions: cols.join(", "),
+  //   values
+  // };
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFilter };

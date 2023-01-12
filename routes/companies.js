@@ -53,18 +53,34 @@ router.post("/", ensureLoggedIn, async function (req, res, next) {
 
 router.get("/", async function (req, res, next) {
   let filters;
+  if (Object.keys(req.query).length !== 0) {
+    let queryFilters = req.query;
 
-  if (req.query) {
+    if (queryFilters.minEmployees !== undefined) {
+      queryFilters.minEmployees = Number(queryFilters.minEmployees);
+    }
+
+    if (queryFilters.maxEmployees !== undefined) {
+      queryFilters.maxEmployees = Number(queryFilters.maxEmployees);
+    }
+
     const validator = jsonschema.validate(
-      req.query,
+      queryFilters,
       companyFilterSchema,
       {required: true}
     );
 
     if (!validator.valid) {
+      console.log('invalid!');
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
+
+    if (queryFilters.minEmployees !== undefined &&
+      queryFilters.maxEmployees !== undefined &&
+      queryFilters.minEmployees > queryFilters.maxEmployees) {
+        throw new BadRequestError('minEmployees must be <= maxEmployees.')
+      }
 
     filters = req.query;
   }
