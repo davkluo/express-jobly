@@ -18,7 +18,7 @@ class Job {
    * Throws BadRequestError if job already in database
    *
    */
-  static async create({ title, salary, equity, companyHandle}) {
+  static async create({ title, salary, equity, companyHandle }) {
     const companyHandleCheck = await db.query(
       `SELECT handle
         FROM companies
@@ -57,7 +57,16 @@ class Job {
    */
 
   static async findAll(filters) {
-
+    const jobsRes = await db.query(
+      `SELECT id,
+              title,
+              salary,
+              equity,
+              company_handle AS "companyHandle"
+         FROM jobs
+         ORDER BY id`,
+    );
+    return jobsRes.rows;
   }
 
   /**
@@ -69,7 +78,22 @@ class Job {
    */
 
   static async get(id) {
+    const jobRes = await db.query(
+      `SELECT id,
+              title,
+              salary,
+              equity,
+              company_handle AS "companyHandle"
+        FROM jobs
+        WHERE id = $1`,
+      [id]
+    );
 
+    const job = jobRes.rows[0];
+
+    if (!job) throw new NotFoundError(`No job: ${job}`);
+
+    return job;
   }
 
   /**
@@ -85,20 +109,33 @@ class Job {
    * Throws NotFoundError if not found
    */
 
-   static async update(id, data) {
+  static async update(id, data) {
+    const { setCols, values } = sqlForPartialUpdate( data, {} );
+    const idVarIdx = "$" + (values.length + 1);
 
-   }
+    const querySql = `
+      UPDATE jobs
+      SET ${setCols}
+        WHERE id = ${idVarIdx}
+        RETURNING id, title, salary, equity, company_handle AS "companyHandle"`;
+    const result = await db.query(querySql, [...values, id]);
+    const job = result.rows[0];
 
-   /**
-    * Delete given job from database; returns undefined.
-    *
-    * Throws NotFoundError if job not found
-    *
-    */
+    if (!job) throw new NotFoundError(`No job: ${id}`);
 
-   static async remove(id) {
+    return job;
+  }
 
-   }
+  /**
+   * Delete given job from database; returns undefined.
+   *
+   * Throws NotFoundError if job not found
+   *
+   */
+
+  static async remove(id) {
+
+  }
 
 
 
