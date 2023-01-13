@@ -63,11 +63,11 @@ router.get("/", async function (req, res, next) {
   //     queryFilters.maxEmployees = Number(queryFilters.maxEmployees);
   //   }
 
-  //   const validator = jsonschema.validate(
-  //     queryFilters,
-  //     companyFilterSchema,
-  //     {required: true}
-  //   );
+    // const validator = jsonschema.validate(
+    //   queryFilters,
+    //   companyFilterSchema,
+    //   {required: true}
+    // );
 
   //   if (!validator.valid) {
   //     console.log('invalid!');
@@ -84,9 +84,9 @@ router.get("/", async function (req, res, next) {
   //   filters = queryFilters;
   // }
 
-  // const companies = await Company.findAll(filters);
+  const jobs = await Job.findAll();
 
-  // return res.json({ companies });
+  return res.json({ jobs });
 });
 
 /** GET /[id]  =>  { job }
@@ -97,8 +97,8 @@ router.get("/", async function (req, res, next) {
  */
 
 router.get("/:id", async function (req, res, next) {
-  // const company = await Company.get(req.params.handle);
-  // return res.json({ company });
+  const job = await Job.get(req.params.id);
+  return res.json({ job });
 });
 
 /** PATCH /[id] { fld1, fld2, ... } => { job }
@@ -113,18 +113,18 @@ router.get("/:id", async function (req, res, next) {
  */
 
 router.patch("/:id", ensureIsAdmin, async function (req, res, next) {
-  // const validator = jsonschema.validate(
-  //   req.body,
-  //   companyUpdateSchema,
-  //   {required:true}
-  // );
-  // if (!validator.valid) {
-  //   const errs = validator.errors.map(e => e.stack);
-  //   throw new BadRequestError(errs);
-  // }
+  const validator = jsonschema.validate(
+    req.body,
+    jobUpdateSchema,
+    {required:true}
+  );
+  if (!validator.valid) {
+    const errs = validator.errors.map(e => e.stack);
+    throw new BadRequestError(errs);
+  }
 
-  // const company = await Company.update(req.params.handle, req.body);
-  // return res.json({ company });
+  const job = await Job.update(req.params.id, req.body);
+  return res.json({ job });
 });
 
 /** DELETE /[id]  =>  { deleted: id }
