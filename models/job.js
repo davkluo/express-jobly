@@ -8,7 +8,6 @@ const { sqlForPartialUpdate, sqlForFilter } = require("../helpers/sql");
 /** Related functions for jobs. */
 
 class Job {
-
   /** Create a job (from data), update db, return new job
    *
    * data should be {title, salary, equity, companyHandle}
@@ -57,6 +56,42 @@ class Job {
    */
 
   static async findAll(filters) {
+    let whereStatement = '';
+    let parameters = [];
+
+    let jobFilterOptions = {
+      title: {
+        column: "title",
+        operator: "ILIKE"
+      },
+      minSalary: {
+        column: "salary",
+        operator: ">="
+      },
+      hasEquity: {
+        column: "equity",
+        operator: "="
+      }
+    };
+
+    if (filters) {
+      // If we are filtering for hasEquity = true, set the operator to > and the
+      // value to 0 so we get "equity" > 0 in our SQL statement
+      if (filters.hasEquity) {
+        jobFilterOptions.hasEquity.operator = '>';
+      }
+
+      if ('hasEquity' in filters) {
+        filters.hasEquity = 0;
+      }
+
+      const { whereConditions, values } = sqlForFilter(filters,
+                                                      jobFilterOptions);
+
+      whereStatement = `WHERE ${whereConditions}`;
+      parameters.push(...values);
+    }
+
     const jobsRes = await db.query(
       `SELECT id,
               title,
@@ -64,8 +99,9 @@ class Job {
               equity,
               company_handle AS "companyHandle"
          FROM jobs
+         ${whereStatement}
          ORDER BY id`,
-    );
+      parameters);
     return jobsRes.rows;
   }
 

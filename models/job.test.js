@@ -95,8 +95,80 @@ describe('findAll', function() {
     ]);
   });
 
-  //filter tests to come later
-})
+  test("works: filter title (case-insensitive)", async function () {
+    const filters = { title: 'cOuNt' };
+    const jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: 'accountant',
+        salary: 50000,
+        equity: 0.2,
+        companyHandle: 'c1'
+      }
+    ]);
+  });
+
+  test("works: filter by minimum salary", async function () {
+    const filters = { minSalary: 45000 };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: 'accountant',
+        salary: 50000,
+        equity: 0.2,
+        companyHandle: 'c1'
+      }
+    ]);
+  });
+
+  test("works: filter by having some equity", async function () {
+    const filters = { hasEquity: true };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: 'accountant',
+        salary: 50000,
+        equity: 0.2,
+        companyHandle: 'c1'
+      }
+    ]);
+  });
+
+  test("works: filter by having no equity", async function () {
+    const filters = { hasEquity: false };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: 'clerk',
+        salary: 40000,
+        equity: 0,
+        companyHandle: 'c2'
+      }
+    ]);
+  });
+
+  test('works: filter by name, minSalary, and hasEquity', async function() {
+    const filters = {
+      title: 'LER',
+      minSalary: 10000,
+      hasEquity: false
+    };
+    let jobs = await Job.findAll(filters);
+    expect(jobs).toEqual([
+      {
+        id: expect.any(Number),
+        title: 'clerk',
+        salary: 40000,
+        equity: 0,
+        companyHandle: 'c2'
+      }
+    ]);
+  });
+});
 
 /******************************************** get */
 

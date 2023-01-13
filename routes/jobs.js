@@ -51,40 +51,36 @@ router.post("/", ensureIsAdmin, async function (req, res, next) {
  */
 
 router.get("/", async function (req, res, next) {
-  // let filters;
-  // if (Object.keys(req.query).length !== 0) {
-  //   let queryFilters = req.query;
+  let filters;
+  if (Object.keys(req.query).length !== 0) {
+    let queryFilters = req.query;
 
-  //   if (queryFilters.minEmployees !== undefined) {
-  //     queryFilters.minEmployees = Number(queryFilters.minEmployees);
-  //   }
+    if (queryFilters.minSalary !== undefined) {
+      queryFilters.minSalary = Number(queryFilters.minSalary);
+    }
 
-  //   if (queryFilters.maxEmployees !== undefined) {
-  //     queryFilters.maxEmployees = Number(queryFilters.maxEmployees);
-  //   }
+    if (queryFilters.hasEquity === 'true') {
+      queryFilters.hasEquity = true;
+    } else if (queryFilters.hasEquity === 'false') {
+      queryFilters.hasEquity = false;
+    }
 
-    // const validator = jsonschema.validate(
-    //   queryFilters,
-    //   companyFilterSchema,
-    //   {required: true}
-    // );
+    const validator = jsonschema.validate(
+      queryFilters,
+      jobFilterSchema,
+      {required: true}
+    );
 
-  //   if (!validator.valid) {
-  //     console.log('invalid!');
-  //     const errs = validator.errors.map(e => e.stack);
-  //     throw new BadRequestError(errs);
-  //   }
+    if (!validator.valid) {
+      console.log('invalid!');
+      const errs = validator.errors.map(e => e.stack);
+      throw new BadRequestError(errs);
+    }
 
-  //   if (queryFilters.minEmployees !== undefined &&
-  //     queryFilters.maxEmployees !== undefined &&
-  //     queryFilters.minEmployees > queryFilters.maxEmployees) {
-  //       throw new BadRequestError('minEmployees must be <= maxEmployees.')
-  //     }
+    filters = queryFilters;
+  }
 
-  //   filters = queryFilters;
-  // }
-
-  const jobs = await Job.findAll();
+  const jobs = await Job.findAll(filters);
 
   return res.json({ jobs });
 });
@@ -133,8 +129,8 @@ router.patch("/:id", ensureIsAdmin, async function (req, res, next) {
  */
 
 router.delete("/:id", ensureIsAdmin, async function (req, res, next) {
-  // await Company.remove(req.params.handle);
-  // return res.json({ deleted: req.params.handle });
+  await Job.remove(req.params.id);
+  return res.json({ deleted: +req.params.id });
 });
 
 module.exports = router;

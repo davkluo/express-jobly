@@ -43,16 +43,16 @@ describe("POST /jobs", function () {
       }
     });
 
-    // const jobId = resp.job.id;
+    const jobId = resp.body.job.id;
 
-    // const getCheck = await request(app)
-    //   .get(`/jobs/${jobId}`);
-    // expect(getCheck.body).toEqual({
-    //   job: {
-    //     id: jobId,
-    //     ...newJob
-    //   }
-    // });
+    const getCheck = await request(app)
+      .get(`/jobs/${jobId}`);
+    expect(getCheck.body).toEqual({
+      job: {
+        id: jobId,
+        ...newJob
+      }
+    });
   });
 
   test("unauth for non-admin users", async function () {
@@ -139,132 +139,133 @@ describe("GET /jobs", function () {
     expect(resp.statusCode).toEqual(500);
   });
 
-//   test("should filter company name (case insensitive)", async function () {
-//     const filterData = { nameLike: "c2" };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("should filter job title (case-insensitive)", async function () {
+    const filterData = { title: "cOuNt" };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(200);
-//     expect(resp.body).toEqual({
-//       companies: [
-//         {
-//           handle: "c2",
-//           name: "C2",
-//           description: "Desc2",
-//           numEmployees: 2,
-//           logoUrl: "http://c2.img"
-//         }
-//       ]
-//     });
-//   });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: 'accountant',
+          salary: 50000,
+          equity: 0.2,
+          companyHandle: 'c1'
+        }
+      ]
+    });
+  });
 
-//   test("should filter by minimum employees", async function () {
-//     const filterData = { minEmployees: 2 };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("should filter by minimum salary", async function () {
+    const filterData = { minSalary: 45000 };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(200);
-//     expect(resp.body).toEqual({
-//       companies: [
-//         {
-//           handle: "c2",
-//           name: "C2",
-//           description: "Desc2",
-//           numEmployees: 2,
-//           logoUrl: "http://c2.img"
-//         },
-//         {
-//           handle: "c3",
-//           name: "C3",
-//           description: "Desc3",
-//           numEmployees: 3,
-//           logoUrl: "http://c3.img",
-//         }
-//       ]
-//     });
-//   });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: 'accountant',
+          salary: 50000,
+          equity: 0.2,
+          companyHandle: 'c1'
+        }
+      ]
+    });
+  });
 
-//   test("should filter by maximum employees", async function () {
-//     const filterData = { maxEmployees: 2 };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("should filter by having equity", async function () {
+    const filterData = { hasEquity: true };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(200);
-//     expect(resp.body).toEqual({
-//       companies: [
-//         {
-//           handle: "c1",
-//           name: "C1",
-//           description: "Desc1",
-//           numEmployees: 1,
-//           logoUrl: "http://c1.img",
-//         },
-//         {
-//           handle: "c2",
-//           name: "C2",
-//           description: "Desc2",
-//           numEmployees: 2,
-//           logoUrl: "http://c2.img"
-//         }
-//       ]
-//     });
-//   });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: 'accountant',
+          salary: 50000,
+          equity: 0.2,
+          companyHandle: 'c1'
+        }
+      ]
+    });
+  });
 
-//   test("should filter by minimum and maximum employees", async function () {
-//     const filterData = { minEmployees: 2, maxEmployees: 2 };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("should filter by having no equity", async function () {
+    const filterData = { hasEquity: false };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(200);
-//     expect(resp.body).toEqual({
-//       companies: [
-//         {
-//           handle: "c2",
-//           name: "C2",
-//           description: "Desc2",
-//           numEmployees: 2,
-//           logoUrl: "http://c2.img"
-//         }
-//       ]
-//     });
-//   });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: 'clerk',
+          salary: 40000,
+          equity: 0,
+          companyHandle: 'c2'
+        }
+      ]
+    });
+  });
 
-//   test("BadRequestError if minEmployees > maxEmployees", async function () {
-//     const filterData = { minEmployees: 3, maxEmployees: 2 };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("should filter by title, minSalary, and hasEquity", async function () {
+    const filterData = {
+      title: 'LER',
+      minSalary: 10000,
+      hasEquity: false
+    };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(400);
-//   });
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      jobs: [
+        {
+          id: expect.any(Number),
+          title: 'clerk',
+          salary: 40000,
+          equity: 0,
+          companyHandle: 'c2'
+        }
+      ]
+    });
+  });
 
-//   test("BadRequestError if inappropriate filter", async function () {
-//     const filterData = { minEmployees: 3, minRevenue: 2 };
-//     const resp = await request(app)
-//       .get("/companies")
-//       .query(filterData);
+  test("BadRequestError if inappropriate filter", async function () {
+    const filterData = { maxSalary: 200000 };
+    const resp = await request(app)
+      .get("/jobs")
+      .query(filterData);
 
-//     expect(resp.statusCode).toEqual(400);
-//   });
+    expect(resp.statusCode).toEqual(400);
+  });
 
-//   test("BadRequestError if data violates schema",
-//     async function () {
-//       const filterData = { nameLike: 1, minEmployees: 'one', maxEmployees: -1};
-//       const resp = await request(app)
-//         .get("/companies")
-//         .query(filterData);
+  test("BadRequestError if data violates schema type",
+    async function () {
+      const filterData = { title: 1, minSalary: 'alot' };
+      const resp = await request(app)
+        .get("/jobs")
+        .query(filterData);
 
-//       expect(resp.statusCode).toEqual(400);
-//     }
-//   );
+      expect(resp.statusCode).toEqual(400);
+    }
+  );
 
 });
 
-// /************************************** GET /jobs/:id */
+/************************************** GET /jobs/:id */
 
 describe("GET /jobs/:id", function () {
   test("works for anon", async function () {
@@ -286,7 +287,7 @@ describe("GET /jobs/:id", function () {
   });
 });
 
-// /************************************** PATCH /companies/:handle */
+/************************************** PATCH /companies/:handle */
 
 describe("PATCH /jobs/:id", function () {
   test("works for admin users", async function () {
@@ -367,33 +368,33 @@ describe("PATCH /jobs/:id", function () {
   });
 });
 
-// /************************************** DELETE /companies/:handle */
+/************************************** DELETE /jobs/:id */
 
-// describe("DELETE /companies/:handle", function () {
-//   test("works for admin users", async function () {
-//     const resp = await request(app)
-//       .delete(`/companies/c1`)
-//       .set("authorization", `Bearer ${uAdminToken}`);
-//     expect(resp.body).toEqual({ deleted: "c1" });
-//   });
+describe("DELETE /jobs/:id", function () {
+  test("works for admin users", async function () {
+    const resp = await request(app)
+      .delete(`/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${uAdminToken}`);
+    expect(resp.body).toEqual({ deleted: testJob.id });
+  });
 
-//   test("unauth for non-admin users", async function () {
-//     const resp = await request(app)
-//       .delete(`/companies/c1`)
-//       .set("authorization", `Bearer ${u1Token}`);
-//     expect(resp.statusCode).toEqual(401);
-//   });
+  test("unauth for non-admin users", async function () {
+    const resp = await request(app)
+    .delete(`/jobs/${testJob.id}`)
+      .set("authorization", `Bearer ${u1Token}`);
+    expect(resp.statusCode).toEqual(401);
+  });
 
-//   test("unauth for anon", async function () {
-//     const resp = await request(app)
-//       .delete(`/companies/c1`);
-//     expect(resp.statusCode).toEqual(401);
-//   });
+  test("unauth for anon", async function () {
+    const resp = await request(app)
+    .delete(`/jobs/${testJob.id}`)
+    expect(resp.statusCode).toEqual(401);
+  });
 
-//   test("not found for no such company", async function () {
-//     const resp = await request(app)
-//       .delete(`/companies/nope`)
-//       .set("authorization", `Bearer ${uAdminToken}`);
-//     expect(resp.statusCode).toEqual(404);
-//   });
-// });
+  test("not found for no such job", async function () {
+    const resp = await request(app)
+      .delete(`/jobs/9999`)
+      .set("authorization", `Bearer ${uAdminToken}`);
+    expect(resp.statusCode).toEqual(404);
+  });
+});
