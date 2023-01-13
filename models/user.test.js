@@ -12,6 +12,7 @@ const {
   commonBeforeEach,
   commonAfterEach,
   commonAfterAll,
+  testJob,
 } = require("./_testCommon");
 
 beforeAll(commonBeforeAll);
@@ -133,13 +134,14 @@ describe("findAll", function () {
 
 describe("get", function () {
   test("works", async function () {
-    let user = await User.get("u1");
+    let user = await User.get("u2");
     expect(user).toEqual({
-      username: "u1",
-      firstName: "U1F",
-      lastName: "U1L",
-      email: "u1@email.com",
+      username: "u2",
+      firstName: "U2F",
+      lastName: "U2L",
+      email: "u2@email.com",
       isAdmin: false,
+      jobs: [testJob.id]
     });
   });
 
@@ -226,5 +228,51 @@ describe("remove", function () {
     } catch (err) {
       expect(err instanceof NotFoundError).toBeTruthy();
     }
+  });
+});
+
+/************************************** applyToJob */
+
+describe("applyToJob", function () {
+  test("works", async function () {
+    await User.applyToJob("u1", testJob.id);
+    const res = await db.query(
+        "SELECT * FROM applications WHERE username='u1' AND job_id = $1",
+        [testJob.id]
+    );
+    expect(res.rows.length).toEqual(1);
+  });
+
+  test("not found if no such user", async function () {
+    try {
+      await User.applyToJob("nope", testJob.id);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("not found if no such job", async function () {
+    try {
+      await User.applyToJob("u1", 99999);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+
+  test("bad request with dup data", async function () {
+    try {
+      await User.applyToJob("u1", testJob.id);
+      await User.applyToJob("u1", testJob.id);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof BadRequestError).toBeTruthy();
+    }
+    const res = await db.query(
+        "SELECT * FROM applications WHERE username='u1' AND job_id = $1",
+        [testJob.id]
+    );
+    expect(res.rows.length).toEqual(1);
   });
 });

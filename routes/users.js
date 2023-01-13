@@ -62,7 +62,8 @@ router.get("/", ensureIsAdmin, async function (req, res, next) {
 
 /** GET /[username] => { user }
  *
- * Returns { username, firstName, lastName, isAdmin }
+ * Returns { username, firstName, lastName, email, isAdmin, jobs }
+ * where jobs = [jobId, jobId, ...]
  *
  * Authorization required: admin or same user
  **/
@@ -121,5 +122,20 @@ router.delete(
   }
 );
 
+
+/** POST /[username]/jobs/[id] => { applied: jobId }
+ *
+ * Authorization required: admin or same user
+ */
+
+router.post(
+  '/:username/jobs/:id',
+  ensureSameUserOrIsAdmin,
+  async function(req, res, next) {
+    const id = +req.params.id;
+    await User.applyToJob(req.params.username, id);
+    return res.json({applied: id});
+  }
+);
 
 module.exports = router;
