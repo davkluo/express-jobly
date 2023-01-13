@@ -72,7 +72,7 @@ describe("create job", function () {
   });
 })
 
-// /******************************************** findAll */
+/******************************************** findAll */
 
 describe('findAll', function() {
   test('works: no filter', async function() {
@@ -98,7 +98,7 @@ describe('findAll', function() {
   //filter tests to come later
 })
 
-// /******************************************** get */
+/******************************************** get */
 
 describe('get', function() {
   test('works', async function() {
@@ -122,7 +122,7 @@ describe('get', function() {
   });
 });
 
-// /******************************************** update */
+/******************************************** update */
 
 describe('update', function() {
   const updateData = {
@@ -198,26 +198,26 @@ describe('update', function() {
   });
 });
 
-// /******************************************** remove */
+/******************************************** remove */
 
-// describe('remove', function() {
-//   test('works', async function() {
-//     await Job.remove(testJob.id);
-//     const result = await db.query(
-//       `SELECT id
-//         FROM jobs
-//         WHERE id = $1`,
-//       [testJob.id]
-//     );
-//     expect(result.rows.length).toEqual(0);
-//   });
+describe('remove', function() {
+  test('works', async function() {
+    await Job.remove(testJob.id);
+    const result = await db.query(
+      `SELECT id
+        FROM jobs
+        WHERE id = $1`,
+      [testJob.id]
+    );
+    expect(result.rows.length).toEqual(0);
+  });
 
-//   test('NotFoundError if no such job', async function() {
-//     try {
-//       await Job.remove(99999);
-//       throw new Error("fail test, you shouldn't get here");
-//     } catch (err) {
-//       expect(err instanceof NotFoundError).toBeTruthy();
-//     }
-//   });
-// });
+  test('NotFoundError if no such job', async function() {
+    try {
+      await Job.remove(99999);
+      throw new Error("fail test, you shouldn't get here");
+    } catch (err) {
+      expect(err instanceof NotFoundError).toBeTruthy();
+    }
+  });
+});

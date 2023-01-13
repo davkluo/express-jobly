@@ -30,7 +30,7 @@ describe("POST /companies", function () {
     numEmployees: 10,
   };
 
-  test("works for admin users", async function () { // change this
+  test("works for admin users", async function () {
     const resp = await request(app)
     .post("/companies")
     .send(newCompany)
@@ -41,7 +41,7 @@ describe("POST /companies", function () {
     });
   });
 
-  test("unauth for non-admin users", async function () { // change this
+  test("unauth for non-admin users", async function () {
     const resp = await request(app)
       .post("/companies")
       .send(newCompany)
