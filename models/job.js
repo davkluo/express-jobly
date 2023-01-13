@@ -17,7 +17,7 @@ class Job {
    * Throws BadRequestError if job already in database
    *
    */
-  static async create({ title, salary, equity, companyHandle }) {
+  static async create({ title, salary = null, equity = null, companyHandle }) {
     const companyHandleCheck = await db.query(
       `SELECT handle
         FROM companies

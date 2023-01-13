@@ -35,6 +35,11 @@ describe("create job", function () {
     companyHandle: 'none'
   };
 
+  const vagueJob = {
+    title: "idk",
+    companyHandle: 'c1'
+  };
+
   test("works", async function () {
     const job = await Job.create(newJob);
     expect(job).toEqual({
@@ -57,6 +62,33 @@ describe("create job", function () {
         title: 'new',
         salary: 60000,
         equity: 0.3,
+        company_handle: "c1"
+      }
+    ]);
+  });
+
+  test("works: null salary and equity", async function () {
+    const job = await Job.create(vagueJob);
+    expect(job).toEqual({
+      id: expect.any(Number),
+      title: 'idk',
+      salary: null,
+      equity: null,
+      companyHandle: "c1"
+    });
+
+    const result = await db.query(
+      `SELECT id, title, salary, equity, company_handle
+       FROM jobs
+       WHERE id = $1`,
+       [job.id]
+    );
+    expect(result.rows).toEqual([
+      {
+        id: job.id,
+        title: 'idk',
+        salary: null,
+        equity: null,
         company_handle: "c1"
       }
     ]);
