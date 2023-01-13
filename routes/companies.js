@@ -99,6 +99,11 @@ router.get("/", async function (req, res, next) {
 
 router.get("/:handle", async function (req, res, next) {
   const company = await Company.get(req.params.handle);
+
+  for (let job of company.jobs) {
+    delete job.companyHandle;
+  }
+
   return res.json({ company });
 });
 
