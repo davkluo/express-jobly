@@ -34,31 +34,32 @@ class Company {
 
   static async create({ handle, name, description, numEmployees, logoUrl }) {
     const duplicateCheck = await db.query(
-        `SELECT handle
-           FROM companies
-           WHERE handle = $1`,
-        [handle]);
+      `SELECT handle
+        FROM companies
+        WHERE handle = $1`,
+      [handle]
+    );
 
-    if (duplicateCheck.rows[0])
+    if (duplicateCheck.rows[0]) {
       throw new BadRequestError(`Duplicate company: ${handle}`);
+    }
 
     const result = await db.query(
-        `INSERT INTO companies(
-          handle,
-          name,
-          description,
-          num_employees,
-          logo_url)
-           VALUES
-             ($1, $2, $3, $4, $5)
-           RETURNING handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"`,
-        [
-          handle,
-          name,
-          description,
-          numEmployees,
-          logoUrl,
-        ],
+      `INSERT INTO companies
+          (handle, name, description, num_employees, logo_url)
+        VALUES
+          ($1, $2, $3, $4, $5)
+        RETURNING
+          handle, name, description,
+          num_employees AS "numEmployees",
+          logo_url AS "logoUrl"`,
+      [
+        handle,
+        name,
+        description,
+        numEmployees,
+        logoUrl,
+      ],
     );
     const company = result.rows[0];
 
@@ -76,24 +77,26 @@ class Company {
     let whereStatement = '';
     let parameters = [];
 
-    if (filters){
-      const { whereConditions, values } = sqlForFilter(filters,
-                                                Company.COMPANY_FILTER_OPTIONS);
+    if (filters) {
+      const { whereConditions, values } = sqlForFilter(
+        filters,
+        Company.COMPANY_FILTER_OPTIONS
+      );
 
       whereStatement = `WHERE ${whereConditions}`;
       parameters.push(...values);
     }
 
     const companiesRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-           FROM companies
-           ${whereStatement}
-           ORDER BY name`,
-        parameters);
+      `SELECT
+          handle, name, description,
+          num_employees AS "numEmployees",
+          logo_url AS "logoUrl"
+        FROM companies
+          ${whereStatement}
+        ORDER BY name`,
+      parameters
+    );
     return companiesRes.rows;
   }
 
@@ -107,28 +110,25 @@ class Company {
 
   static async get(handle) {
     const companyRes = await db.query(
-        `SELECT handle,
-                name,
-                description,
-                num_employees AS "numEmployees",
-                logo_url AS "logoUrl"
-           FROM companies
-           WHERE handle = $1`,
-        [handle]);
+      `SELECT
+          handle, name, description,
+          num_employees AS "numEmployees",
+          logo_url AS "logoUrl"
+        FROM companies
+        WHERE handle = $1`,
+      [handle]
+    );
 
     let company = companyRes.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);
 
     const jobRes = await db.query(
-        `SELECT id,
-                title,
-                salary,
-                equity,
-                company_handle AS "companyHandle"
-            FROM jobs
-            WHERE company_handle = $1`,
-            [handle]);
+      `SELECT
+          id, title, salary, equity, company_handle AS "companyHandle"
+        FROM jobs
+        WHERE company_handle = $1`,
+      [handle]);
 
     company.jobs = jobRes.rows;
 
@@ -149,18 +149,21 @@ class Company {
 
   static async update(handle, data) {
     const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          numEmployees: "num_employees",
-          logoUrl: "logo_url",
-        });
+      data,
+      {
+        numEmployees: "num_employees",
+        logoUrl: "logo_url",
+      });
     const handleVarIdx = "$" + (values.length + 1);
 
     const querySql = `
       UPDATE companies
       SET ${setCols}
         WHERE handle = ${handleVarIdx}
-        RETURNING handle, name, description, num_employees AS "numEmployees", logo_url AS "logoUrl"`;
+        RETURNING
+          handle, name, description,
+          num_employees AS "numEmployees",
+          logo_url AS "logoUrl"`;
     const result = await db.query(querySql, [...values, handle]);
     const company = result.rows[0];
 
@@ -176,11 +179,12 @@ class Company {
 
   static async remove(handle) {
     const result = await db.query(
-        `DELETE
-           FROM companies
-           WHERE handle = $1
-           RETURNING handle`,
-        [handle]);
+      `DELETE
+        FROM companies
+        WHERE handle = $1
+        RETURNING handle`,
+      [handle]
+    );
     const company = result.rows[0];
 
     if (!company) throw new NotFoundError(`No company: ${handle}`);

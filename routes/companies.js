@@ -70,7 +70,6 @@ router.get("/", async function (req, res, next) {
     );
 
     if (!validator.valid) {
-      console.log('Invalid filter requested.');
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
@@ -91,18 +90,13 @@ router.get("/", async function (req, res, next) {
 /** GET /[handle]  =>  { company }
  *
  *  Company is { handle, name, description, numEmployees, logoUrl, jobs }
- *   where jobs is [{ id, title, salary, equity }, ...]
+ *   where jobs is [{ id, title, salary, equity, companyHandle }, ...]
  *
  * Authorization required: none
  */
 
 router.get("/:handle", async function (req, res, next) {
   const company = await Company.get(req.params.handle);
-
-  for (let job of company.jobs) {
-    delete job.companyHandle;
-  }
-
   return res.json({ company });
 });
 
