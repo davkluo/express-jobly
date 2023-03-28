@@ -10,8 +10,8 @@ const JS_TO_SQL = {
   isAdmin: "is_admin"
 };
 
-describe('test sqlForPartialUpdate helper function', function() {
-  test('should return intended setCols and values', function() {
+describe('test sqlForPartialUpdate helper function', function () {
+  test('should return intended setCols and values', function () {
     const dataToUpdate = {
       firstName: "First",
       lastName: "Last",
@@ -24,7 +24,7 @@ describe('test sqlForPartialUpdate helper function', function() {
     expect(values).toEqual(["First", "Last", "newemail@email.com"]);
   });
 
-  test('should throw BadRequestError if given no data to update', function() {
+  test('should throw BadRequestError if given no data to update', function () {
     expect(() => {
       sqlForPartialUpdate({}, JS_TO_SQL);
     }).toThrow(BadRequestError);
@@ -32,8 +32,8 @@ describe('test sqlForPartialUpdate helper function', function() {
 
 });
 
-describe('test sqlForFilter helper function', function() {
-  test('should return intended whereConditions and values', function() {
+describe('test sqlForFilter helper function', function () {
+  test('should return intended whereConditions and values', function () {
     const filters = {
       nameLike: "c2",
       minEmployees: 2,
@@ -41,15 +41,15 @@ describe('test sqlForFilter helper function', function() {
     };
 
     const { whereConditions, values } = sqlForFilter(filters,
-                                                Company.COMPANY_FILTER_OPTIONS);
+      Company.COMPANY_FILTER_OPTIONS);
 
     expect(whereConditions).toEqual(
       '"name" ILIKE $1 AND "num_employees" >= $2 AND "num_employees" <= $3'
-      );
+    );
     expect(values).toEqual(["%c2%", 2, 3]);
   });
 
-  test('should throw BadRequestError if given no filter data', function() {
+  test('should throw BadRequestError if given no filter data', function () {
     expect(() => {
       sqlForFilter({}, Company.COMPANY_FILTER_OPTIONS);
     }).toThrow(BadRequestError);
