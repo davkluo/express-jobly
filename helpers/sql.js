@@ -59,24 +59,6 @@ function sqlForFilter(filters, filterOptions) {
     whereConditions: conditions.join(' AND '),
     values: Object.values(filters)
   };
-
-  // Previous sqlForFilter implementation for reference
-
-  // const cols = keys.map((colName, idx) => {
-  //   if(colName === "nameLike") {
-  //     values[idx] = "%"+values[idx]+"%"
-  //     return `"name" ILIKE $${idx + 1}`
-  //   } else if (colName === "minEmployees") {
-  //       return `"num_employees" >= $${idx + 1}`
-  //     } else if (colName === "maxEmployees") {
-  //       return `"num_employees" <= $${idx + 1}`
-  //     }
-  // });
-
-  // return {
-  //   whereConditions: cols.join(", "),
-  //   values
-  // };
 }
 
 module.exports = { sqlForPartialUpdate, sqlForFilter };
