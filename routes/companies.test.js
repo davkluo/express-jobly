@@ -257,7 +257,8 @@ describe("GET /companies/:handle", function () {
           id: expect.any(Number),
           title: 'accountant',
           salary: 50000,
-          equity: 0.2
+          equity: 0.2,
+          companyHandle: "c1"
       }]
       },
     });
