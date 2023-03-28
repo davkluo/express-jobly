@@ -70,7 +70,7 @@ router.get("/", async function (req, res, next) {
     );
 
     if (!validator.valid) {
-      console.log('invalid!');
+      console.log('Invalid filter requested.');
       const errs = validator.errors.map(e => e.stack);
       throw new BadRequestError(errs);
     }
@@ -85,7 +85,6 @@ router.get("/", async function (req, res, next) {
   }
 
   const companies = await Company.findAll(filters);
-
   return res.json({ companies });
 });
 
