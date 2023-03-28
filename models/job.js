@@ -85,23 +85,23 @@ class Job {
         filters.hasEquity = 0;
       }
 
-      const { whereConditions, values } = sqlForFilter(filters,
-                                                      jobFilterOptions);
+      const { whereConditions, values } = sqlForFilter(
+        filters,
+        jobFilterOptions
+      );
 
       whereStatement = `WHERE ${whereConditions}`;
       parameters.push(...values);
     }
 
     const jobsRes = await db.query(
-      `SELECT id,
-              title,
-              salary,
-              equity,
-              company_handle AS "companyHandle"
-         FROM jobs
-         ${whereStatement}
-         ORDER BY id`,
-      parameters);
+      `SELECT
+          id, title, salary, equity, company_handle AS "companyHandle"
+        FROM jobs
+        ${whereStatement}
+        ORDER BY id`,
+      parameters
+    );
     return jobsRes.rows;
   }
 
@@ -115,11 +115,8 @@ class Job {
 
   static async get(id) {
     const jobRes = await db.query(
-      `SELECT id,
-              title,
-              salary,
-              equity,
-              company_handle AS "companyHandle"
+      `SELECT
+          id, title, salary, equity, company_handle AS "companyHandle"
         FROM jobs
         WHERE id = $1`,
       [id]
